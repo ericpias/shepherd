@@ -12,19 +12,21 @@ import defaultButtons from '../cypress/utils/default-buttons';
 // since importing non UMD, needs assignment
 window.Shepherd = Shepherd;
 
+const DEFAULT_STEP_CLASS = 'shepherd-step-tooltip';
+
 describe('Step', () => {
   describe('Shepherd.Step()', () => {
     const instance = new Shepherd.Tour({
       defaultStepOptions: {
-        classes: 'shepherd-theme-arrows',
+        classes: DEFAULT_STEP_CLASS,
         scrollTo: true
       }
     });
 
     const testStep = instance.addStep('test', {
+      attachTo: 'body',
       id: 'test',
       text: 'This is a step for testing',
-      classes: 'example-step-extra-class',
       buttons: [
         {
           text: 'Next',
@@ -67,16 +69,21 @@ describe('Step', () => {
 
 
     it('has all the correct properties', () => {
-      const values = ['classes', 'scrollTo', 'id', 'text', 'buttons'];
+      const values = ['classes', 'scrollTo', 'attachTo', 'id', 'text', 'buttons'];
       assert.deepEqual(values, Object.keys(testStep.options));
     });
 
     describe('.hide()', () => {
-      it('shows step evoking method, regardless of order', () => {
+      it('detaches from the step target', () => {
         instance.start();
+
+        const targetElem = document.body;
+
+        assert.equal(targetElem.classList.contains('shepherd-enabled'), true);
+
         testStep.hide();
 
-        assert.notEqual(document.querySelector('[data-id=test]').getAttribute('hidden'), null);
+        assert.equal(targetElem.classList.contains('shepherd-enabled'), false);
       });
     });
 
